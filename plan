@@ -1,0 +1,13 @@
+StudentManagementSystem/
+├── src/
+│   ├── App.java
+│   ├── Student.java
+|   |── Student Registration
+│   ├── Marks.java
+│   └── Utils.java
+├── data/
+│   └── students.txt
+├── tests/
+│   └── StudentManagementSystemTests.java
+├── README.md
+

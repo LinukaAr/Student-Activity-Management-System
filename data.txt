@@ -1,0 +1,12 @@
+linuka,01,123@gamil.com,0779821182
+samn,02,234@gmail.com,0779821232
+alex,03,345@gmail.com,0779821342
+emma,04,456@gmail.com,0779821452
+oliver,05,567@gmail.com,0779821562
+ava,06,678@gmail.com,0779821672
+noah,07,789@gmail.com,0779821782
+sarah,student1,email@gmail.com,phone123
+john,student2,email2@gmail.com,phone456
+emily,student3,email3@gmail.com,phone789
+james,student4,email4@gmail.com,phone101
+lily,student5,email5@gmail.com,phone112
