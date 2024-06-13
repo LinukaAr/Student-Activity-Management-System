@@ -1,3 +1,5 @@
+Linuka,w2083086,linukaarambawela@gmail.com,0703911990
+samn,1232,dfsd,231232
 linuka,01,123@gamil.com,0779821182
 samn,02,234@gmail.com,0779821232
 alex,03,345@gmail.com,0779821342
