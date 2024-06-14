@@ -1,20 +1,19 @@
 package src;
-
-import java.util.Scanner;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.util.*;
+import java.io.*;
 
 public class App {
-    private static final int MAX_CAPACITY = 100; // used private access modifier to make it accessible only within the class
-    private static Student[] students = new Student[MAX_CAPACITY];
+    private static final int MAX_CAPACITY = 100;
+    private static String[] studentNames = new String[MAX_CAPACITY];
+    private static String[] studentIds = new String[MAX_CAPACITY];
+    private static String[] studentEmails = new String[MAX_CAPACITY];
     private static int studentCount = 0;
 
     public static void main(String[] args) {
-        boolean exit = false;
         Scanner input = new Scanner(System.in);
+        initialise(studentNames, studentIds, studentEmails);
+        boolean exit = false;
+        
         //used while loop to keep the program running until the user chooses to exit
         while (!exit) {
             // Display the main menu
@@ -28,12 +27,13 @@ public class App {
             System.out.println("5. Save student details to a file");
             System.out.println("6. Load details from file");
             System.out.println("7. Display All Students");
-            System.out.println("8. Exit");
+            System.out.println("8. Manage Student Results");
+            System.out.println("9. Exit");
             System.out.println("==================================================================");
 
             System.out.print("Please Enter Your Choice: ");
             int choice = input.nextInt();
-            input.nextLine(); 
+            input.nextLine();
 
             //used switch statement 
             switch (choice) {
@@ -43,32 +43,35 @@ public class App {
                     break;
                 case 2:
                     System.out.println("Student Registration");
-                    students[studentCount++] = registerStudent(input);
+                    registerStudent(input);
                     break;
                 case 3:
                     System.out.println("Remove student");
-                    deleteStudent(students, studentCount);
+                    deleteStudent(input);
                     break;
                 case 4:
                     System.out.println("Find student");
-                    findStudentById(students, studentCount);
+                    findStudentById(input);
                     break;
                 case 5:
                     System.out.println("Save student to file");
-                    saveToFile(students, studentCount);
+                    saveToFile(input);
                     break;
                 case 6:
                     System.out.println("Load data from file");
-                    studentCount = loadFromFile(students);
+                    loadFromFile(input);
                     break;
                 case 7:
                     System.out.println("Display All Students");
-                    displayStudents(students);
+                    displayStudents();
                     break;
                 case 8:
+                    System.out.println("Manage Student Results");
+                    //manageStudentResults(input);
+                    break;
+                case 9:
                     System.out.println("Exiting...");
-                    // make the exit variable true to exit the loop
-                    exit = true;
+                    exit = true; // make the exit variable true to exit the loop
                     break;
                 default:
                     System.out.println("Invalid choice");
@@ -79,67 +82,108 @@ public class App {
         input.close();
     }
 
-    //function to get available seats
-    private static int getAvailableSeatsCount() {
-        return MAX_CAPACITY - studentCount;//calculate the available seats
+    private static void initialise(String[] names, String[] ids, String[] emails) {
+        for (int i = 0; i < MAX_CAPACITY; i++) {
+            names[i] = "";
+            ids[i] = "";
+            emails[i] = "";
+        }
     }
 
-    //function to register student
-    private static Student registerStudent(Scanner scanner) {
-        System.out.print("Enter Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter ID: ");
-        String id = scanner.nextLine();
-        // check for duplicate ID
-        if (isDuplicateId(id)) {
-            System.out.println("Error: Student is already registered or Please enter a unique ID.");
-            return null;
-        }
-        System.out.print("Enter Email: ");
-        String email = scanner.nextLine();
-        System.out.println("Student registered successfully.");
-        return new Student(name, id, email); 
+    //function to get available seats
+    private static int getAvailableSeatsCount() {
+        return MAX_CAPACITY - studentCount; //calculate the available seats
     }
     
-    //check weather the id is duplicate or not
+    //function to register student
+    private static void registerStudent(Scanner scanner) {
+        if (studentCount >= MAX_CAPACITY) {
+            System.out.println("No available seats.");
+            return;
+        }
+
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+        
+        String id = "";
+        boolean validId = false;
+        //loop until user entered the correct version of ID
+        while (!validId) {
+            System.out.print("Enter ID: ");
+            id = scanner.nextLine();
+            
+            if (id.length() != 8) {
+                System.out.println("Error: ID should be 8 characters long.");
+            } else if (isDuplicateId(id)) {
+                System.out.println("Error: Student is already registered with this ID.");
+            } else {
+                validId = true;
+            }
+        }
+        
+        System.out.println("Student ID is valid.");
+        System.out.print("Enter Email: ");
+        String email = scanner.nextLine();
+        
+        studentNames[studentCount] = name;
+        studentIds[studentCount] = id;
+        studentEmails[studentCount] = email;
+        studentCount++;
+        
+        System.out.println("Student registered successfully.");
+    }
+
+    //check whether the id is duplicate or not
     private static boolean isDuplicateId(String id) {
         for (int i = 0; i < studentCount; i++) {
-            if (students[i] != null && students[i].getId().equals(id)) {
+            if (id.equals(studentIds[i])) {
                 return true;
             }
         }
         return false;
     }
+
     //function to delete student
-    private static void deleteStudent(Student[] students, int studentCount) {
-        Scanner scanner = new Scanner(System.in);
+    private static void deleteStudent(Scanner scanner) {
         System.out.print("Enter student ID: ");
         String id = scanner.nextLine();
+        boolean found = false;
         for (int i = 0; i < studentCount; i++) {
             // check if the student id is available in the array
-            if (students[i] != null && students[i].getId().equals(id)) {
-                students[i] = null;
+            if (studentIds[i] != null && studentIds[i].equals(id)) {
+                // Shift all elements to the left to fill the gap
+                for (int j = i; j < studentCount - 1; j++) {
+                    studentNames[j] = studentNames[j + 1];
+                    studentIds[j] = studentIds[j + 1];
+                    studentEmails[j] = studentEmails[j + 1];
+                }
+                studentNames[studentCount - 1] = null;
+                studentIds[studentCount - 1] = null;
+                studentEmails[studentCount - 1] = null;
+                studentCount--;
                 System.out.println("Student with ID " + id + " removed successfully.");
-                return;
+                found = true;
+                break;
             }
         }
-        System.out.println("Student with ID " + id + " not found.");
+        if (!found) {
+            System.out.println("Student with ID " + id + " not found.");
+        }
     }
 
     //function to find student by id
-    private static void findStudentById(Student[] students, int studentCount) {
-        Scanner scanner = new Scanner(System.in);
+    private static void findStudentById(Scanner scanner) {
         System.out.print("Enter student ID: ");
         String id = scanner.nextLine();
         boolean found = false;
         //loop through the array to find the student and check if the student id is available in the array
         for (int i = 0; i < studentCount; i++) {
-            if (students[i] != null && students[i].getId().equals(id)) {
+            if (studentIds[i] != null && studentIds[i].equals(id)) {
                 System.out.println("Student found:");
                 System.out.println("-------------------------------------------------");
                 System.out.printf("| %-10s | %-10s | %-20s |\n", "Name", "ID", "Email");
                 System.out.println("-------------------------------------------------");
-                System.out.printf("| %-10s | %-10s | %-20s |\n", students[i].getName(), students[i].getId(), students[i].getEmail());
+                System.out.printf("| %-10s | %-10s | %-20s |\n", studentNames[i], studentIds[i], studentEmails[i]);
                 System.out.println("-------------------------------------------------");
                 found = true;
                 break;
@@ -152,75 +196,60 @@ public class App {
     }
 
     //function to display all students
-    private static void displayStudents(Student[] students) {
-
+    private static void displayStudents() {
         System.out.println("\nRegistered Students:");
         System.out.println("-------------------------------------------------");
         System.out.printf("| %-10s | %-10s | %-20s |\n", "Name", "ID", "Email");
         System.out.println("-------------------------------------------------");
         //loop through the array to display all the students
-        for (int i = 0; i < students.length; i++) {
-            if (students[i] != null) {
-                System.out.printf("| %-10s | %-10s | %-20s |\n", students[i].getName(), students[i].getId(), students[i].getEmail());
+        for (int i = 0; i < studentCount; i++) {
+            if (studentNames[i] != null && studentIds[i] != null && studentEmails[i] != null) {
+                System.out.printf("| %-10s | %-10s | %-20s |\n", studentNames[i], studentIds[i], studentEmails[i]);
             }
         }
         System.out.println("-------------------------------------------------");
     }
 
     //function to save students to file 
-    private static void saveToFile(Student[] students, int studentCount) {
-        Scanner scanner = new Scanner(System.in);
+    private static void saveToFile(Scanner scanner) {
         System.out.print("Enter file name: ");
         String fileName = scanner.nextLine();
-
-        try {
-            FileWriter fileWriter = new FileWriter(fileName);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);//create a buffered writer object
-
+    
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
             for (int i = 0; i < studentCount; i++) {
-                if (students[i] != null) {
-                    String studentData = students[i].getName() + "," + students[i].getId() + "," + students[i].getEmail() + ",";//store the student data in a string
-                    bufferedWriter.write(studentData);//write the student data to the file
+                if (studentNames[i] != null && studentIds[i] != null && studentEmails[i] != null) {
+                    String studentData = studentNames[i] + "," + studentIds[i] + "," + studentEmails[i];
+                    bufferedWriter.write(studentData);
                     bufferedWriter.newLine();
                 }
             }
-
-            bufferedWriter.close();
             System.out.println("Students saved to file successfully.");
-        } catch (IOException e) {//catch the exception if there is an error saving the students to file
+        } catch (IOException e) {
             System.out.println("Error saving students to file: " + e.getMessage());
         }
     }
-
+    
     //function to load students from file
-    private static int loadFromFile(Student[] students) {
-        Scanner scanner = new Scanner(System.in);
+    private static void loadFromFile(Scanner scanner) {
         System.out.print("Enter file name: ");
         String fileName = scanner.nextLine();
-
-        int studentCount = 0;
-        try {
-            File file = new File(fileName);
-            Scanner fileScanner = new Scanner(file);
+        studentCount = 0;
+    
+        try (Scanner fileScanner = new Scanner(new File(fileName))) {
             //loop through the file to read the student data
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] studentData = line.split(",");
-                String name = studentData[0];
-                String id = studentData[1];
-                String email = studentData[2];
-                students[studentCount] = new Student(name, id, email);//create a new student object
-                studentCount++;//increment the student count
+                if (studentData.length == 3) {
+                    studentNames[studentCount] = studentData[0];
+                    studentIds[studentCount] = studentData[1];
+                    studentEmails[studentCount] = studentData[2];
+                    studentCount++;
+                }
             }
-
-            fileScanner.close();
             System.out.println("Students loaded from file successfully.");
-
-        } catch (FileNotFoundException e) {//catch the exception if the file is not found
+        } catch (FileNotFoundException e) {
             System.out.println("Error loading students from file: " + e.getMessage());
-        }
-
-        return studentCount;
     }
 }
-
+}
