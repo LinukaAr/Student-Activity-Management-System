@@ -1,89 +1,80 @@
-// package src;
+package src;
 
-// public class Student {
-//     private String name;
-//     private String id;
-//     private String email;
-//     private Module[] modules;
+import java.util.List;
+import java.util.ArrayList; // Add this import statement
 
+public class Student {
+    private String name;
+    private String id;
+    private String email;
+    private List<Module> modules;
 
-//     public Student(String name, String id, String email) {
-//         this.name = name;
-//         this.id = id;
-//         this.email = email;
-//         this.modules = new Module[3];
-    
-        
-//     }
+    public Student(String name, String id, String email) {
+        this.name = name;
+        this.id = id;
+        this.email = email;
+        this.modules = new ArrayList<>();
+    }
 
-//     // Getters and setters for each field
-//     public String getName() {
-//         return name;
-//     }
+    public List<Module> getModules() {
+        return this.modules;
+    }
 
-//     public void setName(String name) {
-//         this.name = name;
-//     }
+    // Getters and setters for each field
+    public String getName() {
+        return name;
+    }
 
-//     public String getId() {
-//         return id;
-//     }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-//     public void setId(String id) {
-//         this.id = id;
-//     }
+    public String getId() {
+        return id;
+    }
 
-//     public String getEmail() {
-//         return email;
-//     }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-//     public void setEmail(String email) {
-//         this.email = email;
-//     }
+    public String getEmail() {
+        return email;
+    }
 
-//     public Module[] getModules() {
-//         return modules;
-//     }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-//     public void addModule(int index, Module module) {
-//         if (index >= 0 && index < 3) {
-//             modules[index] = module;
-//         }
-//     }
+    public void addModule(Module module) {
+        this.modules.add(module);
+    }
 
-//     public double calculateAverageMarks() {
-//         int totalMarks = 0;
-//         for (Module module : modules) {
-//             if (module != null) {
-//                 totalMarks += module.getMarks();
-//             }
-//         }
-//         return totalMarks / 3.0;
-//     }
+    public int getTotalMarks() {
+        int total = 0;
+        for (Module module : modules) {
+            for (int mark : module.getMarks()) {
+                total += mark;
+            }
+        }
+        return total;
+    }
 
-//     public String calculateOverallGrade() {
-//         double averageMarks = calculateAverageMarks();
-//         if (averageMarks >= 80) {
-//             return "Distinction";
-//         } else if (averageMarks >= 70) {
-//             return "Merit";
-//         } else if (averageMarks >= 40) {
-//             return "Pass";
-//         } else {
-//             return "Fail";
-//         }
-//     }
+    public double getAverageMarks() {
+        return getTotalMarks() / (double) 3;
+    }
 
-
-
-//     @Override
-//     public String toString() {
-//         return "Student{" +
-//                 "name='" + name + '\'' +
-//                 ", id='" + id + '\'' +
-//                 ", email='" + email + '\'' 
-//                 ;
-//     }
-// }
-
-
+    public String getGrade() {
+        double average = getAverageMarks();
+        if (average >= 70) {
+            return "A";
+        } else if (average >= 60) {
+            return "B";
+        } else if (average >= 50) {
+            return "C";
+        } else if (average >= 40) {
+            return "D";
+        } else {
+            return "F";
+        }
+    }
+}

@@ -66,8 +66,8 @@ public class App {
                     displayStudents();
                     break;
                 case 8:
-                    System.out.println("Manage Student Results");
-                    //manageStudentResults(input);
+                    
+                    manageStudentResults(input);
                     break;
                 case 9:
                     System.out.println("Exiting...");
@@ -101,17 +101,16 @@ public class App {
             System.out.println("No available seats.");
             return;
         }
-
+    
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
-        
+    
         String id = "";
         boolean validId = false;
-        //loop until user entered the correct version of ID
         while (!validId) {
             System.out.print("Enter ID: ");
             id = scanner.nextLine();
-            
+    
             if (id.length() != 8) {
                 System.out.println("Error: ID should be 8 characters long.");
             } else if (isDuplicateId(id)) {
@@ -120,18 +119,22 @@ public class App {
                 validId = true;
             }
         }
-        
+    
         System.out.println("Student ID is valid.");
         System.out.print("Enter Email: ");
         String email = scanner.nextLine();
-        
+    
         studentNames[studentCount] = name;
         studentIds[studentCount] = id;
         studentEmails[studentCount] = email;
         studentCount++;
-        
+    
+        // Add the new student to the students list
+        students.add(new Student(name, id, email));
+    
         System.out.println("Student registered successfully.");
     }
+    
 
     //check whether the id is duplicate or not
     private static boolean isDuplicateId(String id) {
@@ -230,13 +233,14 @@ public class App {
     }
     
     //function to load students from file
+    // function to load students from file
     private static void loadFromFile(Scanner scanner) {
         System.out.print("Enter file name: ");
         String fileName = scanner.nextLine();
         studentCount = 0;
-    
+
         try (Scanner fileScanner = new Scanner(new File(fileName))) {
-            //loop through the file to read the student data
+            students.clear();  // Clear the list of students before loading
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] studentData = line.split(",");
@@ -245,11 +249,152 @@ public class App {
                     studentIds[studentCount] = studentData[1];
                     studentEmails[studentCount] = studentData[2];
                     studentCount++;
+                    students.add(new Student(studentData[0], studentData[1], studentData[2])); // Add student to the list
                 }
             }
             System.out.println("Students loaded from file successfully.");
-        } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException e) {
             System.out.println("Error loading students from file: " + e.getMessage());
+            }
+        }
+
+    //print the mange Student menu
+    private static void manageStudentResults(Scanner input) {
+        boolean exit = false;
+        while (!exit){
+        System.out.println("==================================================================");
+        System.out.println("Manage Student Results");
+        System.out.println("1. Add module marks ");
+        System.out.println("2. Generate a summary");
+        System.out.println("3. Generate complete report");
+        System.out.println("4.Main Menu");
+        System.out.println("==================================================================");
+        System.out.print("Please enter your choice: ");
+        
+
+        int choice = input.nextInt();
+        switch (choice) {
+            case 1:
+                addModuleMarks(input);
+                break;
+            case 2:
+                genarateSummery();
+                break;
+            case 3:
+               generateCompleteReport();
+                break;
+            case 4:
+                exit = true; 
+                main(studentEmails);
+                break;
+            default:
+                System.out.println("Invalid choice");
+                break;
+        }
     }
+    }
+
+    public static void addModuleMarks(Scanner input) {
+        System.out.print("Enter student ID: ");
+        String studentId = input.next();
+    
+        // Find the student with the given ID
+        Student student = students.stream()
+        .filter(s -> s.getId().equals(studentId))
+        .findFirst()
+        .orElse(null);
+
+        if (student == null) {
+            System.out.println("No student found with the given ID.");
+            return;
+        }
+    
+        System.out.print("Enter marks for module 1: ");
+        int mark1 = input.nextInt();
+        System.out.print("Enter marks for module 2: ");
+        int mark2 = input.nextInt();
+        System.out.print("Enter marks for module 3: ");
+        int mark3 = input.nextInt();
+        int[] marks = {mark1, mark2, mark3};
+        Module module = new Module(marks);
+        student.addModule(module);
+    
+        System.out.println("Marks added successfully for student " + studentId);
+    }
+    
+    private static List<Student> students = new ArrayList<>();
+    
+    private static Student findStudentById(String id) {
+        for (Student student : students) {
+            if (student.getId().equals(id)) {
+                return student;
+            }
+        }
+        return null;
+    }
+        //function to generate summary
+    private static void genarateSummery() {
+        System.out.println("Summary:");
+        System.out.println("-------------------------------------------------");
+        System.out.println("Total Student Registrations: " + studentCount);
+    
+        int studentsWithPassingMarks = 0;
+        for (int i = 0; i < studentCount; i++) {
+            Student student = findStudentById(studentIds[i]);
+            if (student != null) {
+                boolean passingMarks = true;
+                for (Module module : student.getModules()) {
+                    for (int mark : module.getMarks()) {
+                        if (mark < 40) {
+                            passingMarks = false;
+                            break;
+                        }
+                    }
+                    if (!passingMarks) break;
+                }
+                if (passingMarks) {
+                    studentsWithPassingMarks++;
+                }
+            }
+        }
+    
+        System.out.println("Total Students with Passing Marks in all Modules: " + studentsWithPassingMarks);
+        System.out.println("-------------------------------------------------");
+    }
+
+    public static void generateCompleteReport() {
+        sortStudentsByAverageMarks(students);
+        System.out.printf("%-10s | %-15s | %-15s | %-15s | %-15s | %-5s | %-7s | %-5s%n", 
+            "Student ID", "Student Name", "Module 1 marks", "Module 2 marks", "Module 3 marks", "Total", "Average", "Grade");
+        System.out.println("--------------------------------------------------------------------------------------");
+        for (Student student : students) {
+            System.out.printf("%-10s | %-15s | ", student.getId(), student.getName());
+            int[] marks = student.getModules().isEmpty() ? new int[3] : student.getModules().get(0).getMarks();
+            for (int i = 0; i < 3; i++) {
+                if (i < marks.length) {
+                    System.out.printf("%-15s | ", marks[i]);
+                } else {
+                    System.out.printf("%-15s | ", "N/A");
+                }
+            }
+            System.out.printf("%-5s | %-7.2f | %-5s%n", student.getTotalMarks(), student.getAverageMarks(), student.getGrade());
+        }
+    }
+        
+        
+
+    public static void sortStudentsByAverageMarks(List<Student> students) {
+        int n = students.size();
+        for (int i = 0; i < n-1; i++) {
+            for (int j = 0; j < n-i-1; j++) {
+                if (students.get(j).getAverageMarks() < students.get(j+1).getAverageMarks()) {
+                    // swap students[j+1] and students[j]
+                    Student temp = students.get(j);
+                    students.set(j, students.get(j+1));
+                    students.set(j+1, temp);
+                }
+            }
+        }
 }
+
 }
