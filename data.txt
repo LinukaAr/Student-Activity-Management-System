@@ -19,7 +19,7 @@ Mia,DD123456,mia@example.com
 Ethan,EE123456,ethan@example.com
 Isabella,FF123456,isabella@example.com
 Jacob,GG123456,jacob@example.com
-Charlotte,HH123456,charlotte@example.com
+Charlotte,HH123456,charlot@example.com
 Mason,II123456,mason@example.com
 Amelia,JJ123456,amelia@example.com
 Lucas,KK123456,lucas@example.com

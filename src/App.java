@@ -242,8 +242,8 @@ public class App {
         try (Scanner fileScanner = new Scanner(new File(fileName))) {
             students.clear();  // Clear the list of students before loading
             while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                String[] studentData = line.split(",");
+                String line = fileScanner.nextLine();// Read a line from the file
+                String[] studentData = line.split(",");// Split the line by comma
                 if (studentData.length == 3) {
                     studentNames[studentCount] = studentData[0];
                     studentIds[studentCount] = studentData[1];
@@ -299,10 +299,10 @@ public class App {
         String studentId = input.next();
     
         // Find the student with the given ID
-        Student student = students.stream()
-        .filter(s -> s.getId().equals(studentId))
-        .findFirst()
-        .orElse(null);
+        Student student = students.stream()//stream is used to iterate over the collection
+        .filter(s -> s.getId().equals(studentId))  //filter is used to filter the elements based on the given condition
+        .findFirst()//return the first element of the stream
+        .orElse(null);// return the default value if no value is present
 
         if (student == null) {
             System.out.println("No student found with the given ID.");
@@ -315,14 +315,14 @@ public class App {
         int mark2 = input.nextInt();
         System.out.print("Enter marks for module 3: ");
         int mark3 = input.nextInt();
-        int[] marks = {mark1, mark2, mark3};
+        int[] marks = {mark1, mark2, mark3};//array to store the marks
         Module module = new Module(marks);
         student.addModule(module);
     
         System.out.println("Marks added successfully for student " + studentId);
     }
     
-    private static List<Student> students = new ArrayList<>();
+    private static List<Student> students = new ArrayList<>();//
     
     private static Student findStudentById(String id) {
         for (Student student : students) {
@@ -333,44 +333,45 @@ public class App {
         return null;
     }
         //function to generate summary
-    private static void genarateSummery() {
-        System.out.println("Summary:");
-        System.out.println("-------------------------------------------------");
-        System.out.println("Total Student Registrations: " + studentCount);
-    
-        int studentsWithPassingMarks = 0;
-        for (int i = 0; i < studentCount; i++) {
-            Student student = findStudentById(studentIds[i]);
-            if (student != null) {
-                boolean passingMarks = true;
-                for (Module module : student.getModules()) {
-                    for (int mark : module.getMarks()) {
-                        if (mark < 40) {
-                            passingMarks = false;
-                            break;
+        private static void genarateSummery() {
+             
+            System.out.println("-------------------------------------------------");
+            System.out.println("Total Student Registrations: " + studentCount);
+        
+            int studentsWithPassingMarks = 0;
+            for (int i = 0; i < studentCount; i++) {
+                Student student = findStudentById(studentIds[i]);
+                if (student != null && !student.getModules().isEmpty()) {//check if the student is not null and the modules are not empty
+                    boolean passingMarks = true;
+                    for (Module module : student.getModules()) {
+                        for (int mark : module.getMarks()) {
+                            if (mark < 40) {
+                                passingMarks = false;
+                                break;
+                            }
                         }
+                        if (!passingMarks) break;
                     }
-                    if (!passingMarks) break;
-                }
-                if (passingMarks) {
-                    studentsWithPassingMarks++;
+                    if (passingMarks) {
+                        studentsWithPassingMarks++;
+                    }
                 }
             }
+        
+            System.out.println("Total Students with Passing Marks in all Modules: " + studentsWithPassingMarks);
+            System.out.println("-------------------------------------------------");
         }
-    
-        System.out.println("Total Students with Passing Marks in all Modules: " + studentsWithPassingMarks);
-        System.out.println("-------------------------------------------------");
-    }
+
 
     public static void generateCompleteReport() {
         sortStudentsByAverageMarks(students);
         System.out.printf("%-10s | %-15s | %-15s | %-15s | %-15s | %-5s | %-7s | %-5s%n", 
             "Student ID", "Student Name", "Module 1 marks", "Module 2 marks", "Module 3 marks", "Total", "Average", "Grade");
-        System.out.println("--------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------------");
         for (Student student : students) {
             System.out.printf("%-10s | %-15s | ", student.getId(), student.getName());
-            int[] marks = student.getModules().isEmpty() ? new int[3] : student.getModules().get(0).getMarks();
-            for (int i = 0; i < 3; i++) {
+            int[] marks = student.getModules().isEmpty() ? new int[3] : student.getModules().get(0).getMarks();//check if the modules are empty
+            for (int i = 0; i < 3; i++) {//loop through the array to display the marks
                 if (i < marks.length) {
                     System.out.printf("%-15s | ", marks[i]);
                 } else {
@@ -382,13 +383,12 @@ public class App {
     }
         
         
-
+    //function to sort students by average marks(Bubble sort algorithm)
     public static void sortStudentsByAverageMarks(List<Student> students) {
         int n = students.size();
         for (int i = 0; i < n-1; i++) {
             for (int j = 0; j < n-i-1; j++) {
                 if (students.get(j).getAverageMarks() < students.get(j+1).getAverageMarks()) {
-                    // swap students[j+1] and students[j]
                     Student temp = students.get(j);
                     students.set(j, students.get(j+1));
                     students.set(j+1, temp);
