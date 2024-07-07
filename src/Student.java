@@ -1,31 +1,16 @@
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Student {
     private String name;
     private String id;
     private String email;
-    private List<Module> modules;
-    
+    private Module[] modules;
 
     public Student(String name, String id, String email) {
         this.name = name;
         this.id = id;
         this.email = email;
-        this.modules = new ArrayList<>();
-       
+        this.modules = new Module[1]; // Initialize the array with a size of 1
     }
 
-    public List<Module> getModules() {
-        return this.modules;
-    }
-
-    public void addModule(Module module) {
-        this.modules.add(module);
-    }
-
-    // Getters and setters for each field
     public String getName() {
         return name;
     }
@@ -50,5 +35,24 @@ public class Student {
         this.email = email;
     }
 
-    
+    public Module[] getModules() {
+        return modules;
+    }
+
+    public void addModule(Module module) {
+        // Resize the array if it's full
+        if (modules[modules.length - 1]!= null) {
+            Module[] newModules = new Module[modules.length * 2];
+            System.arraycopy(modules, 0, newModules, 0, modules.length);
+            modules = newModules;
+        }
+
+        // Add the module to the array
+        for (int i = 0; i < modules.length; i++) {
+            if (modules[i] == null) {
+                modules[i] = module;
+                break;
+            }
+        }
+    }
 }

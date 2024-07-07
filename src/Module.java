@@ -1,14 +1,12 @@
-
 public class Module {
     private int[] marks;
-    
 
     public Module(int[] marks) {
         this.marks = marks;
-       
     }
+
     public int[] getMarks() {
-        return this.marks;
+        return marks;
     }
 
     public int getTotalMarks() {
@@ -19,12 +17,15 @@ public class Module {
         return total;
     }
 
-    public double getAverageMarks() {
-        return getTotalMarks() / (double) marks.length;
+    public static double getAverage(int[] marks) {
+        int total = 0;
+        for (int mark : marks) {
+            total += mark;
+        }
+        return total / (double) marks.length;
     }
 
-    public String getGrade() {
-        double average = getAverageMarks();
+    public static String getGrade(double average) {
         if (average >= 70) {
             return "A";
         } else if (average >= 60) {

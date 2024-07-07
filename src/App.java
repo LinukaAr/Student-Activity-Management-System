@@ -7,12 +7,15 @@ public class App {
     private static String[] studentIds = new String[MAX_CAPACITY];
     private static String[] studentEmails = new String[MAX_CAPACITY];
     private static int studentCount = 0;
+    private static Student[] students = new Student[MAX_CAPACITY];
+    
+
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         initialise(studentNames, studentIds, studentEmails);
         boolean exit = false;
-        
+    
         //used while loop to keep the program running until the user chooses to exit
         while (!exit) {
             // Display the main menu
@@ -29,56 +32,63 @@ public class App {
             System.out.println("8. Manage Student Results");
             System.out.println("9. Exit");
             System.out.println("==================================================================");
-
+    
             System.out.print("Please Enter Your Choice: ");
-            int choice = input.nextInt();
-            input.nextLine();
-
-            //switch statement 
-            switch (choice) {
-                case 1:
-                    int availableSeats = getAvailableSeatsCount(); //call the function to get available seats
-                    System.out.println("Available Seats: " + availableSeats);
-                    break;
-                case 2:
-                    System.out.println("Student Registration");
-                    registerStudent(input);
-                    break;
-                case 3:
-                    System.out.println("Remove student");
-                    deleteStudent(input);
-                    break;
-                case 4:
-                    System.out.println("Find student");
-                    findStudentById(input);
-                    break;
-                case 5:
-                    System.out.println("Save student to file");
-                    saveToFile(input);
-                    break;
-                case 6:
-                    System.out.println("Load data from file");
-                    loadFromFile(input);
-                    break;
-                case 7:
-                    System.out.println("Display All Students");
-                    displayStudents();
-                    break;
-                case 8:
-                    manageStudentResults(input);
-                    break;
-                case 9:
-                    System.out.println("Exiting...");
-                    exit = true; // make the exit variable true to exit the loop
-                    break;
-                default:
-                    System.out.println("Invalid choice"); //if the user enters invalid choice
-                    break;
+            try {
+                int choice = input.nextInt();
+                input.nextLine();
+    
+                //switch statement 
+                switch (choice) {
+                    case 1:
+                        int availableSeats = getAvailableSeatsCount(); //call the function to get available seats
+                        System.out.println("Available Seats: " + availableSeats);
+                        break;
+                    case 2:
+                        System.out.println("Student Registration");
+                        registerStudent(input);
+                        break;
+                    case 3:
+                        System.out.println("Remove student");
+                        deleteStudent(input);
+                        break;
+                    case 4:
+                        System.out.println("Find student");
+                        findStudentById(input);
+                        break;
+                    case 5:
+                        System.out.println("Save student to file");
+                        saveToFile(input);
+                        break;
+                    case 6:
+                        System.out.println("Load data from file");
+                        loadFromFile(input);
+                        break;
+                    case 7:
+                        System.out.println("Display All Students");
+                        displayStudents();
+                        break;
+                    case 8:
+                        manageStudentResults(input);
+                        break;
+                    case 9:
+                        System.out.println("Exiting...");
+                        exit = true; // make the exit variable true to exit the loop
+                        break;
+                    default:
+                        System.out.println("Invalid choice"); //if the user enters invalid choice
+                        input.nextLine(); // consume the invalid input
+                        break;
+                }
+            } catch (java.util.InputMismatchException e) { //catch the exception if the user enters invalid input 
+                System.out.println("Invalid input. Please enter a number.");
+                input.nextLine();
             }
         }
-
-        input.close();
+    
+        input.close(); 
     }
+
     //function to initialise the arrays
     private static void initialise(String[] names, String[] ids, String[] emails) {
         for (int i = 0; i < MAX_CAPACITY; i++) { //loop through the array until the max capacity and set the values to empty
@@ -110,29 +120,27 @@ public class App {
             id = scanner.nextLine();
     
             if (id.length() != 8) {
-                System.out.println("Error: ID should be 8 characters long."); //check if the id is 8 characters long
+                System.out.println("Error: ID should be 8 characters long.");
             } else if (isDuplicateId(id)) {
-                System.out.println("Error: Student is already registered with this ID."); //check if the id is duplicate
+                System.out.println("Error: Student is already registered with this ID.");
             } else {
                 validId = true;
             }
         }
     
-        System.out.println("Student ID is valid.");
         System.out.print("Enter Email: ");
         String email = scanner.nextLine();
     
+        Student student = new Student(name, id, email);
+        students[studentCount] = student;
         studentNames[studentCount] = name;
         studentIds[studentCount] = id;
         studentEmails[studentCount] = email;
         studentCount++;
     
-        // add student to the list to use in the manage student results
-        students.add(new Student(name, id, email));
-    
         System.out.println("Student registered successfully.");
     }
-    
+
 
     //check whether the id is duplicate or not
     private static boolean isDuplicateId(String id) {
@@ -237,178 +245,212 @@ public class App {
         studentCount = 0;
 
         try (Scanner fileScanner = new Scanner(new File(fileName))) {
-            // students.clear(); // Clear the list of students before loading
             while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine(); // Read a line from the file
-                String[] studentData = line.split(","); // Split the line by comma
+                String line = fileScanner.nextLine(); 
+                String[] studentData = line.split(","); 
                 if (studentData.length == 3) {
-                    studentNames[studentCount] = studentData[0]; // Store the student data in the arrays
+                    studentNames[studentCount] = studentData[0]; 
                     studentIds[studentCount] = studentData[1];
                     studentEmails[studentCount] = studentData[2];
+                    students[studentCount] = new Student(studentData[0], studentData[1], studentData[2]); 
                     studentCount++;
-                    students.add(new Student(studentData[0], studentData[1], studentData[2])); // Add student to the list for manage student results
                 }
             }
             System.out.println("Students loaded from file successfully.");
-            } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("Error loading students from file: " + e.getMessage());
-            }
         }
+    }
 
     //print the mange Student menu
     private static void manageStudentResults(Scanner input) {
         boolean exit = false;
-        while (!exit){
-        System.out.println("==================================================================");
-        System.out.println("Manage Student Results");
-        System.out.println("1. Add module marks ");
-        System.out.println("2. Generate a summary");
-        System.out.println("3. Generate complete report");
-        System.out.println("4.Main Menu");
-        System.out.println("==================================================================");
-        System.out.print("Please enter your choice: ");
-        
-
-        int choice = input.nextInt();
-        switch (choice) {
-            case 1:
-                addModuleMarks(input);
-                break;
-            case 2:
-                generateSummary();
-                break;
-            case 3:
-               generateCompleteReport();
-                break;
-            case 4:
-                exit = true; 
-                main(studentEmails);
-                break;
-            default:
-                System.out.println("Invalid choice");
-                break;
+        while (!exit) {
+            System.out.println("==================================================================");
+            System.out.println("Manage Student Results");
+            System.out.println("1. Add module marks ");
+            System.out.println("2. Generate a summary");
+            System.out.println("3. Generate complete report");
+            System.out.println("4.Main Menu");
+            System.out.println("===============================================================");
+    
+            System.out.print("Please enter your choice: ");
+            try {
+                int choice = input.nextInt();
+                switch (choice) {
+                    case 1:
+                        addModuleMarks(input);
+                        break;
+                    case 2:
+                        generateSummary();
+                        break;
+                    case 3:
+                        generateCompleteReport();
+                        break;
+                    case 4:
+                        exit = true; 
+                        break;
+                    default:
+                        System.out.println("Invalid choice");
+                        break;
+                }
+    
+            } catch (java.util.InputMismatchException e) { //catch the exception if the user enters invalid input
+                System.out.println("Invalid input. Please enter a number.");
+                input.nextLine();
+            }
         }
-    }
     }
 
     public static void addModuleMarks(Scanner input) {
         System.out.print("Enter student ID: ");
         String studentId = input.next();
-    
-        // Find the student with the given ID
-        Student student = students.stream() // stream is used to iterate over the collection
-            .filter(s -> s.getId().equals(studentId)) // filter is used to filter the elements based on the given condition
-            .findFirst() // return the first element of the stream
-            .orElse(null); // return the default value if no value is present
-    
+
+        Student student = null;
+        for (int i = 0; i < studentCount; i++) {
+            if (studentIds[i].equals(studentId)) {
+                student = students[i];
+                break;
+            }
+        }
+
         if (student == null) {
             System.out.println("No student found with the given ID.");
             return;
         }
-    
+
         System.out.print("Enter marks for module 1: ");
         int mark1 = input.nextInt();
         System.out.print("Enter marks for module 2: ");
         int mark2 = input.nextInt();
         System.out.print("Enter marks for module 3: ");
         int mark3 = input.nextInt();
-        int[] marks = {mark1, mark2, mark3}; // array to store the marks
+        int[] marks = {mark1, mark2, mark3};
         Module module = new Module(marks);
         student.addModule(module);
-    
+
         System.out.println("Marks added successfully for student " + studentId);
     }
-    
-    private static List<Student> students = new ArrayList<>();
-    
-    // private static Student findStudentById(String id) {
-    //     for (Student student : students) {
-    //         if (student.getId().equals(id)) {
-    //             return student;
-    //         }
-    //     }
-    //     return null;
-    // }
-    
+        
     // function to generate summary
     private static void generateSummary() {
-        System.out.println("-------------------------------------------------");
-        System.out.println("Total Student Registrations: " + students.size());
-    
-        int studentsWithPassingMarks = 0;
-        for (Student student : students) {
-            if (student != null && !student.getModules().isEmpty()) { // check if the student is not null and the modules are not empty
-                boolean passingMarks = true;
-                for (Module module : student.getModules()) {
-                    for (int mark : module.getMarks()) {
-                        if (mark < 40) {
-                            passingMarks = false;
-                            break;
+        int totalStudentRegistrations = studentCount;
+        int totalStudentsPassedAllModules = 0;
+
+        for (int i = 0; i < studentCount; i++) {
+            Student student = students[i];
+            if (student!= null) {
+                Module[] modules = student.getModules();
+                if (modules!= null && modules.length > 0) {
+                    Module module = modules[0];
+                    if (module!= null) {
+                        int[] marks = module.getMarks();
+                        if (marks!= null && marks.length > 0) {
+                            boolean passedAllModules = true;
+                            for (int mark : marks) {
+                                if (mark < 40) {
+                                    passedAllModules = false;
+                                    break;
+                                }
+                            }
+                            if (passedAllModules) {
+                                totalStudentsPassedAllModules++;
+                            }
                         }
                     }
-                    if (!passingMarks) break;
-                }
-                if (passingMarks) {
-                    studentsWithPassingMarks++;
                 }
             }
         }
-    
-        System.out.println("Total Students with Passing Marks in all Modules: " + studentsWithPassingMarks);
-        System.out.println("-------------------------------------------------");
+
+        System.out.println("Summary:");
+        System.out.println("Total student registrations: " + totalStudentRegistrations);
+        System.out.println("Total students who havepassed all three modules: " + totalStudentsPassedAllModules);
     }
+
     
-    public static void generateCompleteReport() {
-        sortStudentsByAverageMarks(students);
-        System.out.printf("%-10s | %-15s | %-15s | %-15s | %-15s | %-5s | %-7s | %-5s%n", 
-            "Student ID", "Student Name", "Module 1 marks", "Module 2 marks", "Module 3 marks", "Total", "Average", "Grade");
-        System.out.println("--------------------------------------------------------------------------------------------------------------");
-        for (Student student : students) {
-            System.out.printf("%-10s | %-15s | ", student.getId(), student.getName());
-            int[] marks = student.getModules().isEmpty() ? new int[3] : student.getModules().get(0).getMarks(); // check if the modules are empty
-            for (int i = 0; i < 3; i++) { // loop through the array to display the marks
-                if (i < marks.length) {
-                    System.out.printf("%-15s | ", marks[i]);
-                } else {
-                    System.out.printf("%-15s | ", "N/A");
-                }
-            }
-            if (!student.getModules().isEmpty()) {
-                Module module = student.getModules().get(0);
-                System.out.printf("%-5s | %-7.2f | %-5s%n", module.getTotalMarks(), module.getAverageMarks(), module.getGrade());
-            } else {
-                System.out.printf("%-5s | %-7s | %-5s%n", "N/A", "N/A", "N/A");
-            }
+    private static void generateCompleteReport() {
+        bubbleSortStudentsByAverage(); // Sort students by average marks in ascending order
+    
+        System.out.println("Complete Report:");
+        System.out.println("-------------------------------------------------------------------------------------------------------");
+        System.out.println("Student ID | Student Name | Module 1 Marks | Module 2 Marks | Module 3 Marks | Total | Average | Grade");
+        System.out.println("-------------------------------------------------------------------------------------------------------");
+    
+        // First pass: Print students with marks
+        for (int i = 0; i < studentCount; i++) {
+            printStudentReport(students[i], true); // true indicates we're printing students with marks
+        }
+    
+        // Second pass: Print students without marks
+        for (int i = 0; i < studentCount; i++) {
+            printStudentReport(students[i], false); // false indicates we're printing students without marks
         }
     }
     
-    // function to sort students by average marks (Bubble sort algorithm)
-    public static void sortStudentsByAverageMarks(List<Student> students) {
-        int n = students.size();
-        for (int i = 0; i < n-1; i++) {
-            for (int j = 0; j < n-i-1; j++) {
-                boolean jHasModules = !students.get(j).getModules().isEmpty();
-                boolean jPlusOneHasModules = !students.get(j+1).getModules().isEmpty();
+    private static void printStudentReport(Student student, boolean withMarks) {
+        if (student != null) {
+            Module[] modules = student.getModules();
+            if (modules != null && modules.length > 0) {
+                Module module = modules[0];
+                if (module != null) {
+                    int[] marks = module.getMarks();
+                    if (marks != null && marks.length > 0) {
+                        if (withMarks) { // Print only if student has marks
+                            int total = 0;
+                            for (int mark : marks) {
+                                total += mark;
+                            }
+                            double average = total / (double) marks.length;
+                            String grade = Module.getGrade(average);
     
-                // Prioritize students with modules over those without
-                if (jHasModules && !jPlusOneHasModules) {
-                    // Keep the student with modules ahead, no swap needed
-                    continue;
-                } else if (!jHasModules && jPlusOneHasModules) {
-                    // Swap to move the student with no modules down
-                    Student temp = students.get(j);
-                    students.set(j, students.get(j+1));
-                    students.set(j+1, temp);
-                } else if (jHasModules && jPlusOneHasModules) {
-                    // Both students have modules, proceed with average marks comparison
-                    if (students.get(j).getModules().get(0).getAverageMarks() < students.get(j+1).getModules().get(0).getAverageMarks()) {
-                        Student temp = students.get(j);
-                        students.set(j, students.get(j+1));
-                        students.set(j+1, temp);
+                            System.out.println(String.format("%-10s | %-12s | %-14d | %-14d | %-14d | %-5d | %-7.2f | %s", student.getId(), student.getName(), marks[0], marks[1], marks[2], total, average, grade));
+                        }
+                    } else if (!withMarks) { // Print only if student does not have marks
+                        System.out.println(String.format("%-10s | %-12s | %-14s | %-14s | %-14s | %-5s | %-7s | %s", student.getId(), student.getName(), "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"));
+                    }
+                } else if (!withMarks) {
+                    System.out.println(String.format("%-10s | %-12s | %-14s | %-14s | %-14s | %-5s | %-7s | %s", student.getId(), student.getName(), "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"));
+                }
+            } else if (!withMarks) {
+                System.out.println(String.format("%-10s | %-12s | %-14s | %-14s | %-14s | %-5s | %-7s | %s", student.getId(), student.getName(), "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"));
+            }
+        }
+    }
+       private static void bubbleSortStudentsByAverage() {
+        for (int i = 0; i < studentCount - 1; i++) {
+            for (int j = 0; j < studentCount - i - 1; j++) {
+                Student student1 = students[j];
+                Student student2 = students[j + 1];
+
+                if (student1!= null && student2!= null) {
+                    Module[] modules1 = student1.getModules();
+                    Module[] modules2 = student2.getModules();
+
+                    if (modules1!= null && modules1.length > 0 && modules2!= null && modules2.length > 0) {
+                        Module module1 = modules1[0];
+                        Module module2 = modules2[0];
+
+                        if (module1!= null && module2!= null) {
+                            int[] marks1 = module1.getMarks();
+                            int[] marks2 = module2.getMarks();
+
+                            if (marks1!= null && marks1.length > 0 && marks2!= null && marks2.length > 0) {
+                                double average1 = Module.getAverage(marks1);
+                                double average2 = Module.getAverage(marks2);
+
+                                if (average1 < average2) {
+                                    // Swap students
+                                    Student temp = students[j];
+                                    students[j] = students[j + 1];
+                                    students[j + 1] = temp;
+                                }
+                            }
+                        }
                     }
                 }
-                // If both students don't have modules, they are considered equal in this context, so no swap is performed
             }
         }
     }
-}    
+
+}
+    
