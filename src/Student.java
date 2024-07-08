@@ -11,6 +11,7 @@ public class Student {
         this.modules = new Module[1]; // Initialize the array with a size of 1
     }
 
+    //getters and setters
     public String getName() {
         return name;
     }
@@ -39,6 +40,7 @@ public class Student {
         return modules;
     }
 
+    // Method to add a module to the student
     public void addModule(Module module) {
         // Resize the array if it's full
         if (modules[modules.length - 1]!= null) {

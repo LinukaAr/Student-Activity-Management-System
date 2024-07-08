@@ -1,7 +1,6 @@
 Linuka,w2083086,linuka@gmail.com
-Samn,AB123456,dfsd@example.com
-Linuka,CD123456,123@gmail.com
-Samn,EF123456,234@gmail.com
+Shamn,AB123456,dfsd@example.com
+Nevil,CD123456,123@gmail.com
 Alex,GH123456,345@gmail.com
 Emma,IJ123456,456@gmail.com
 Oliver,KL123456,567@gmail.com

@@ -6,8 +6,9 @@ public class App {
     private static String[] studentNames = new String[MAX_CAPACITY];//arrays to store student names,id and emails with max capacity
     private static String[] studentIds = new String[MAX_CAPACITY];
     private static String[] studentEmails = new String[MAX_CAPACITY];
-    private static int studentCount = 0;
     private static Student[] students = new Student[MAX_CAPACITY];
+    private static int studentCount = 0;
+
     
 
 
@@ -16,7 +17,7 @@ public class App {
         initialise(studentNames, studentIds, studentEmails);
         boolean exit = false;
     
-        //used while loop to keep the program running until the user chooses to exit
+        // keep the program running until the user chooses to option 9
         while (!exit) {
             // Display the main menu
             System.out.println("==================================================================");
@@ -41,7 +42,7 @@ public class App {
                 //switch statement 
                 switch (choice) {
                     case 1:
-                        int availableSeats = getAvailableSeatsCount(); //call the function to get available seats
+                        int availableSeats = getAvailableSeatsCount(); //call the method to get available seats
                         System.out.println("Available Seats: " + availableSeats);
                         break;
                     case 2:
@@ -80,7 +81,7 @@ public class App {
                         input.nextLine(); // consume the invalid input
                         break;
                 }
-            } catch (java.util.InputMismatchException e) { //catch the exception if the user enters invalid input 
+            } catch (java.util.InputMismatchException e) { //catch the error if the user enters invalid input 
                 System.out.println("Invalid input. Please enter a number.");
                 input.nextLine();
             }
@@ -89,7 +90,7 @@ public class App {
         input.close(); 
     }
 
-    //function to initialise the arrays
+    //method to initialise the arrays
     private static void initialise(String[] names, String[] ids, String[] emails) {
         for (int i = 0; i < MAX_CAPACITY; i++) { //loop through the array until the max capacity and set the values to empty
             names[i] = "";
@@ -98,12 +99,12 @@ public class App {
         }
     }
 
-    //function to get available seats
+    //method to get available seats
     private static int getAvailableSeatsCount() {
         return MAX_CAPACITY - studentCount; //calculate the available seats
     }
     
-    //function to register student
+    //method to register student
     private static void registerStudent(Scanner scanner) {
         if (studentCount >= MAX_CAPACITY) {
             System.out.println("No available seats.");
@@ -152,7 +153,7 @@ public class App {
         return false;
     }
 
-    //function to delete student
+    //method to delete student
     private static void deleteStudent(Scanner scanner) {
         System.out.print("Enter student ID: ");
         String id = scanner.nextLine();
@@ -179,7 +180,7 @@ public class App {
         
     }
 
-    //function to find student by id
+    //method to find student by id
     private static void findStudentById(Scanner scanner) {
         System.out.print("Enter student ID: ");
         String id = scanner.nextLine();
@@ -203,22 +204,30 @@ public class App {
         }
     }
 
-    //function to display all students
+    //method to display all students
     private static void displayStudents() {
         System.out.println("\nRegistered Students:");
         System.out.println("-------------------------------------------------");
         System.out.printf("| %-10s | %-10s | %-20s |\n", "Name", "ID", "Email");
         System.out.println("-------------------------------------------------");
-        //loop through the array to display all the students
+    
+        // Create a temporary array of Student objects
+        Student[] tempStudents = new Student[studentCount];
         for (int i = 0; i < studentCount; i++) {
-            if (studentNames[i] != null && studentIds[i] != null && studentEmails[i] != null) {
-                System.out.printf("| %-10s | %-10s | %-20s |\n", studentNames[i], studentIds[i], studentEmails[i]);
-            }
+            tempStudents[i] = new Student(studentNames[i], studentIds[i], studentEmails[i]);
+        }
+    
+        // Sort the temporary array by name
+        Arrays.sort(tempStudents, Comparator.comparing(Student::getName));
+    
+        // Display the sorted students
+        for (Student student : tempStudents) {
+            System.out.printf("| %-10s | %-10s | %-20s |\n", student.getName(), student.getId(), student.getEmail());
         }
         System.out.println("-------------------------------------------------");
     }
 
-    //function to save students to file 
+    //method to save students to file 
     private static void saveToFile(Scanner scanner) {
         System.out.print("Enter file name: ");
         String fileName = scanner.nextLine();
@@ -238,7 +247,7 @@ public class App {
         }
     }
     
-    // function to load students from file
+    // method to load students from file
     private static void loadFromFile(Scanner scanner) {
         System.out.print("Enter file name: ");
         String fileName = scanner.nextLine();
@@ -295,7 +304,7 @@ public class App {
                         break;
                 }
     
-            } catch (java.util.InputMismatchException e) { //catch the exception if the user enters invalid input
+            } catch (java.util.InputMismatchException e) { //print the error if the user enters invalid input
                 System.out.println("Invalid input. Please enter a number.");
                 input.nextLine();
             }
@@ -332,12 +341,12 @@ public class App {
         System.out.println("Marks added successfully for student " + studentId);
     }
         
-    // function to generate summary
+    // method to generate summary
     private static void generateSummary() {
-        int totalStudentRegistrations = studentCount;
-        int totalStudentsPassedAllModules = 0;
+        int totalStudentRegistrations = studentCount; // Total student registrations
+        int totalStudentsPassedAllModules = 0; 
 
-        for (int i = 0; i < studentCount; i++) {
+        for (int i = 0; i < studentCount; i++) { //loop through the array to get the total students who passed all the modules
             Student student = students[i];
             if (student!= null) {
                 Module[] modules = student.getModules();
@@ -348,13 +357,13 @@ public class App {
                         if (marks!= null && marks.length > 0) {
                             boolean passedAllModules = true;
                             for (int mark : marks) {
-                                if (mark < 40) {
+                                if (mark < 40) { // Check if the student has passed all modules
                                     passedAllModules = false;
                                     break;
                                 }
                             }
                             if (passedAllModules) {
-                                totalStudentsPassedAllModules++;
+                                totalStudentsPassedAllModules++; // Increment the count if the student has passed all modules
                             }
                         }
                     }
@@ -367,7 +376,7 @@ public class App {
         System.out.println("Total students who havepassed all three modules: " + totalStudentsPassedAllModules);
     }
 
-    
+    // method to generate complete report
     private static void generateCompleteReport() {
         bubbleSortStudentsByAverage(); // Sort students by average marks in ascending order
     
@@ -387,6 +396,7 @@ public class App {
         }
     }
     
+    //method to print student report
     private static void printStudentReport(Student student, boolean withMarks) {
         if (student != null) {
             Module[] modules = student.getModules();
@@ -416,9 +426,11 @@ public class App {
             }
         }
     }
-       private static void bubbleSortStudentsByAverage() {
-        for (int i = 0; i < studentCount - 1; i++) {
-            for (int j = 0; j < studentCount - i - 1; j++) {
+
+    //method to sort students by average marks
+    private static void bubbleSortStudentsByAverage() {
+        for (int i = 0; i < studentCount - 1; i++) { 
+            for (int j = 0; j < studentCount - i - 1; j++) { 
                 Student student1 = students[j];
                 Student student2 = students[j + 1];
 
@@ -453,4 +465,4 @@ public class App {
     }
 
 }
-    
+
